@@ -6,7 +6,8 @@ fn main() {
     let key = args.next().unwrap(); // unwrap will crash the program if not found
     let value = args.next().expect("Argument <value> not provided"); // expect works like unwrap but it can show a custom msg
     let mut database = Database::new().expect("Database::new() crashed");
-    database.insert(key, value)
+    database.insert(key, value);
+    database.flush().unwrap();
 }
 
 struct Database {
@@ -37,5 +38,15 @@ impl Database {
 
     fn insert(&mut self, key: String, value: String) {
         self.map.insert(key, value);
+    }
+
+    fn flush(&self) -> Result<(), std::io::Error> {
+        // writes keys and values from database to disk
+        let mut contents = String::new();
+        for (key, value) in &self.map {
+            let kvpair = format!("{}\t{}\n", key, value);
+            contents.push_str(&kvpair); // can also use + operator to concat strings
+        }
+        std::fs::write("kv.db", contents)
     }
 }
