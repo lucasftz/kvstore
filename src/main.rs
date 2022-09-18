@@ -31,7 +31,7 @@ impl Database {
     }
 
     fn flush(&self) -> Result<(), std::io::Error> {
-        // writes keys and values from database to disk
+        // write keys and values from database to disk
         let mut contents = String::new();
         for (key, value) in &self.map {
             contents.push_str(&format!("{key}\t{value}\n"));
