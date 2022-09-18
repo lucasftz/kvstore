@@ -3,26 +3,20 @@ use std::collections::HashMap;
 fn main() {
     let mut database = Database::new().expect("Database::new() crashed");
     let mut args = std::env::args().skip(1);
-    let command = args.next().expect("argument <command> not provided");
+    let command = args.next().throw_error("argument <command> not provided");
     match command.as_str() {
         "get" => {
-            let key = args.next().expect("argument <key> not provided");
-            match database.get(key) {
-                Some(value) => println!("{value}"),
-                None => {
-                    println!("unknown key");
-                    std::process::exit(1);
-                }
-            };
+            let key = args.next().throw_error("argument <key> not provided");
+            println!("{}", database.get(key).throw_error("unknown key"))
         }
         "add" => {
-            let key = args.next().expect("argument <key> not provided");
-            let value = args.next().expect("argument <value> not provided");
+            let key = args.next().throw_error("argument <key> not provided");
+            let value = args.next().throw_error("argument <value> not provided");
             database.insert(key, value);
             database.flush().unwrap();
         }
         _ => {
-            println!("unknown command <{command}>");
+            println!("\x1b[31;1merror\x1b[0m: unknown command");
             std::process::exit(1);
         }
     }
@@ -41,7 +35,7 @@ impl Database {
             let contents = std::fs::read_to_string("kv.db")?;
             // populate map with keys/values
             for line in contents.lines() {
-                let (key, value) = line.split_once('\t').expect("Corrupted database");
+                let (key, value) = line.split_once('\t').expect("corrupted database");
                 map.insert(key.to_owned(), value.to_owned());
             }
         } else {
@@ -65,5 +59,21 @@ impl Database {
             contents.push_str(&format!("{key}\t{value}\n"));
         }
         std::fs::write("kv.db", contents)
+    }
+}
+
+trait OptionWrapper<I> {
+    fn throw_error(self, msg: &str) -> I;
+}
+
+impl<T> OptionWrapper<T> for Option<T> {
+    fn throw_error(self, msg: &str) -> T {
+        match self {
+            Some(value) => value,
+            None => {
+                println!("\x1b[31;1merror\x1b[0m: {msg}");
+                std::process::exit(1)
+            }
+        }
     }
 }
