@@ -1,18 +1,30 @@
 use std::collections::HashMap;
 
 fn main() {
-    let mut args = std::env::args().skip(1);
-    let key = args.next().expect("Insufficient aguments provided");
     let mut database = Database::new().expect("Database::new() crashed");
-    if args.len() == 0 {
-        match database.get(key) {
-            Some(value) => println!("{value}"),
-            None => std::process::exit(1),
-        };
-    } else {
-        let value = args.next().unwrap();
-        database.insert(key, value);
-        database.flush().unwrap();
+    let mut args = std::env::args().skip(1);
+    let command = args.next().expect("argument <command> not provided");
+    match command.as_str() {
+        "get" => {
+            let key = args.next().expect("argument <key> not provided");
+            match database.get(key) {
+                Some(value) => println!("{value}"),
+                None => {
+                    println!("unknown key");
+                    std::process::exit(1);
+                }
+            };
+        }
+        "add" => {
+            let key = args.next().expect("argument <key> not provided");
+            let value = args.next().expect("argument <value> not provided");
+            database.insert(key, value);
+            database.flush().unwrap();
+        }
+        _ => {
+            println!("unknown command <{command}>");
+            std::process::exit(1);
+        }
     }
 }
 
