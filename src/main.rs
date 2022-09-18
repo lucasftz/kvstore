@@ -15,6 +15,10 @@ fn main() {
             database.insert(key, value);
             database.flush().unwrap();
         }
+        "remove" => {
+            let key = args.next().throw_error("argument <key> not provided");
+            database.remove(key).throw_error("unknown key");
+        }
         _ => {
             println!("\x1b[31;1merror\x1b[0m: unknown command");
             std::process::exit(1);
@@ -50,6 +54,10 @@ impl Database {
 
     fn get(&self, key: String) -> Option<&String> {
         return self.map.get(&key);
+    }
+
+    fn remove(&mut self, key: String) -> Option<String> {
+        return self.map.remove(&key);
     }
 
     fn flush(&self) -> Result<(), std::io::Error> {
