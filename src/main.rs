@@ -25,8 +25,7 @@ fn main() {
             println!("{contents}");
         }
         "help" => {
-            let contents = database.get_help_txt().if_error("help.txt does not exist");
-            println!("{contents}");
+            println!("{}", database.get_help_txt());
         }
         _ => {
             database.unknown().if_error("unknown command");
@@ -81,11 +80,8 @@ impl Database {
         };
     }
 
-    fn get_help_txt(&self) -> Option<String> {
-        return match std::fs::read_to_string("src/help.txt") {
-            Ok(c) => Some(c),
-            Err(_) => None,
-        };
+    fn get_help_txt(&self) -> String {
+        return "A key value store written in Rust.\nCOMMANDS:\n\tadd <KEY> <VALUE>\tAdd a key value pair to the database\n\tget <KEY>\t\tAccess the corresponding value of <KEY>\n\thelp\t\t\tList all commands and their uses\n\tlist\t\t\tList all keys stored in the database\n\tremove <KEY>\t\tRemove a key value pair from the database\n\nSECRET KEYS:\nAdding a key prefixed by a dot will make it a secret key! It won't be listed though the list command, but you will be able to access its value normally.\n".to_owned();
     }
 
     fn flush(&self) -> Result<(), std::io::Error> {
