@@ -67,7 +67,9 @@ impl Database {
     fn keys_as_str(&self) -> Option<String> {
         let mut contents = String::new();
         for key in self.map.keys() {
-            contents.push_str(&format!("{key}\n"));
+            if !key.starts_with(".") {
+                contents.push_str(&format!("{key}\n"));
+            }
         }
         return match contents.as_str() {
             "" => None,
