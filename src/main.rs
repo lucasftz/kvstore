@@ -25,8 +25,7 @@ fn main() {
             println!("{contents}");
         }
         _ => {
-            println!("\x1b[31;1merror\x1b[0m: unknown command");
-            std::process::exit(1);
+            database.unknown().throw_error("unknown command");
         }
     }
 }
@@ -83,6 +82,12 @@ impl Database {
             contents.push_str(&format!("{key}\t{value}\n"));
         }
         std::fs::write("kv.db", contents)
+    }
+
+    fn unknown(&self) -> Option<()> {
+        return match "" {
+            _ => None,
+        };
     }
 }
 
