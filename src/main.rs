@@ -18,6 +18,7 @@ fn main() {
         "remove" => {
             let key = args.next().throw_error("argument <key> not provided");
             database.remove(key).throw_error("unknown key");
+            database.flush().unwrap();
         }
         _ => {
             println!("\x1b[31;1merror\x1b[0m: unknown command");
