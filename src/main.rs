@@ -20,6 +20,10 @@ fn main() {
             database.remove(key).throw_error("unknown key");
             database.flush().unwrap();
         }
+        "list" => {
+            let contents = database.keys_as_str().throw_error("empty database");
+            println!("{contents}");
+        }
         _ => {
             println!("\x1b[31;1merror\x1b[0m: unknown command");
             std::process::exit(1);
@@ -59,6 +63,17 @@ impl Database {
 
     fn remove(&mut self, key: String) -> Option<String> {
         return self.map.remove(&key);
+    }
+
+    fn keys_as_str(&self) -> Option<String> {
+        let mut contents = String::new();
+        for key in self.map.keys() {
+            contents.push_str(&format!("{key}\n"));
+        }
+        return match contents.as_str() {
+            "" => None,
+            _ => Some(contents.trim_end().to_owned()),
+        };
     }
 
     fn flush(&self) -> Result<(), std::io::Error> {
