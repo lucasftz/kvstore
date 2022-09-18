@@ -62,8 +62,8 @@ impl Database {
     }
 }
 
-trait OptionWrapper<I> {
-    fn throw_error(self, msg: &str) -> I;
+trait OptionWrapper<T> {
+    fn throw_error(self, msg: &str) -> T;
 }
 
 impl<T> OptionWrapper<T> for Option<T> {
