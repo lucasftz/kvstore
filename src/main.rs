@@ -2,11 +2,18 @@ use std::collections::HashMap;
 
 fn main() {
     let mut args = std::env::args().skip(1);
-    let key = args.next().expect("Argument <key> not provided");
-    let value = args.next().expect("Argument <value> not provided");
+    let key = args.next().expect("Insufficient aguments provided");
     let mut database = Database::new().expect("Database::new() crashed");
-    database.insert(key, value);
-    database.flush().unwrap();
+    if args.len() == 0 {
+        match database.get(key) {
+            Some(value) => println!("{value}"),
+            None => std::process::exit(1),
+        };
+    } else {
+        let value = args.next().unwrap();
+        database.insert(key, value);
+        database.flush().unwrap();
+    }
 }
 
 struct Database {
@@ -33,6 +40,10 @@ impl Database {
 
     fn insert(&mut self, key: String, value: String) {
         self.map.insert(key, value);
+    }
+
+    fn get(&self, key: String) -> Option<&String> {
+        return self.map.get(&key);
     }
 
     fn flush(&self) -> Result<(), std::io::Error> {
