@@ -1,0 +1,11 @@
+A key value store written in Rust.
+
+COMMANDS:
+	add <KEY> <VALUE>	Add a key value pair to the database
+	get <KEY>		Access the corresponding value of <KEY>
+	help			List all commands and their uses
+	list			List all keys stored in the database
+	remove <KEY>		Remove a key value pair from the database
+
+SECRET KEYS:
+Adding a key prefixed by a dot will make it a secret key! It won't be listed though the list command, but you will be able to access its value normally.

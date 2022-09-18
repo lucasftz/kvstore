@@ -24,6 +24,12 @@ fn main() {
             let contents = database.keys_as_str().throw_error("empty database");
             println!("{contents}");
         }
+        "help" => {
+            let contents = database
+                .get_help_txt()
+                .throw_error("help.txt does not exist");
+            println!("{contents}");
+        }
         _ => {
             database.unknown().throw_error("unknown command");
         }
@@ -74,6 +80,13 @@ impl Database {
         return match contents.as_str() {
             "" => None,
             _ => Some(contents.trim_end().to_owned()),
+        };
+    }
+
+    fn get_help_txt(&self) -> Option<String> {
+        return match std::fs::read_to_string("src/help.txt") {
+            Ok(c) => Some(c),
+            Err(_) => None,
         };
     }
 
