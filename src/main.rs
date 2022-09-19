@@ -40,17 +40,17 @@ struct Database {
 impl Database {
     fn new() -> Result<Database, std::io::Error> {
         let mut map: HashMap<String, String> = HashMap::new();
-        let is_database = std::path::Path::new("kv.db").exists();
+        let is_database = database_path().exists();
         if is_database {
             // parse keys/values from kv.db
-            let contents = std::fs::read_to_string("kv.db")?;
+            let contents = std::fs::read_to_string(database_path())?;
             // populate map with keys/values
             for line in contents.lines() {
                 let (key, value) = line.split_once('\t').expect("corrupted database");
                 map.insert(key.to_owned(), value.to_owned());
             }
         } else {
-            std::fs::File::create("kv.db").expect("failed to create database");
+            std::fs::File::create(database_path()).expect("failed to create database");
         }
         Ok(Database { map })
     }
@@ -90,7 +90,7 @@ impl Database {
         for (key, value) in &self.map {
             contents.push_str(&format!("{key}\t{value}\n"));
         }
-        std::fs::write("kv.db", contents)
+        std::fs::write(database_path(), contents)
     }
 
     fn unknown(&self) -> Option<()> {
@@ -114,4 +114,14 @@ impl<T> OptionWrapper<T> for Option<T> {
             }
         }
     }
+}
+
+fn database_path() -> std::path::PathBuf {
+    return match home::home_dir() {
+        Some(mut directory) => {
+            directory.push(".kv.db");
+            directory
+        }
+        None => panic!("home directory not found"),
+    };
 }
